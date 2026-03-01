@@ -122,6 +122,12 @@ footer{position:relative;z-index:1;text-align:center;padding:28px;border-top:1px
 </style>
 </head>
 <body>
+<script>
+  const RENDER_URL = 'https://fyp-extractor-backend.onrender.com';
+  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? ''
+    : RENDER_URL;
+</script>
 <header>
   <div class="header-inner">
     <a class="logo" href="#"><div class="logo-icon">⬡</div><span class="logo-text">Uni<span>Extract</span> AI</span></a>
@@ -397,7 +403,7 @@ async function extractFile(){
   const inp=document.getElementById('file-inp');if(!inp.files[0])return;
   clearErr('file-err');showLoad('file-load',true);showRes('file-result',false);document.getElementById('file-btn').disabled=true;
   const fd=new FormData();fd.append('file',inp.files[0]);
-  try{const res=await fetch('/api/extract/file',{method:'POST',body:fd});const data=await res.json();
+  try{const res=await fetch(API_BASE + '/api/extract/file',{method:'POST',body:fd});const data=await res.json();
     if(data.error){showErr('file-err',data.error);return;}
     lastText=data.text||'';
     document.getElementById('file-rsub').textContent=(data.original_filename||'')+' · '+fmtSize(data.file_size||0);
@@ -418,7 +424,7 @@ async function runAI(){
   const text=document.getElementById('ai-text').value.trim();
   if(!text){showErr('ai-err','Please paste document text first');return;}
   clearErr('ai-err');showLoad('ai-load',true);showRes('ai-result',false);
-  try{const res=await fetch('/api/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+  try{const res=await fetch(API_BASE + '/api/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
     const data=await res.json();if(data.error){showErr('ai-err',data.error);return;}
     renderAI(data);showRes('ai-result',true);
   }catch(e){showErr('ai-err',e.message);}
@@ -428,7 +434,7 @@ async function runAI(){
 async function runDomain(){
   const text=document.getElementById('ai-text').value.trim();if(!text){showErr('ai-err','Please paste text first');return;}
   clearErr('ai-err');showLoad('ai-load',true);
-  try{const res=await fetch('/api/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+  try{const res=await fetch(API_BASE + '/api/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
     const data=await res.json();if(data.error){showErr('ai-err',data.error);return;}
     const d=data.domain||{};const e=document.getElementById('ai-err');
     e.style.background='rgba(67,212,160,0.06)';e.style.borderColor='rgba(67,212,160,0.25)';e.style.color='var(--accent4)';
@@ -440,7 +446,7 @@ async function runDomain(){
 async function runSummary(){
   const text=document.getElementById('ai-text').value.trim();if(!text){showErr('ai-err','Please paste text first');return;}
   clearErr('ai-err');showLoad('ai-load',true);showRes('ai-result',false);
-  try{const res=await fetch('/api/ai/summarize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+  try{const res=await fetch(API_BASE + '/api/ai/summarize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
     const data=await res.json();if(data.error){showErr('ai-err',data.error);return;}
     document.getElementById('ai-rsub').textContent='Quick Summary';
     document.getElementById('ai-domain-badge').innerHTML='';
@@ -502,7 +508,7 @@ async function askDoc(){
   const text=document.getElementById('qa-text').value.trim();const q=document.getElementById('qa-q').value.trim();
   if(!text){showErr('qa-err','Please paste document text first');return;}if(!q){showErr('qa-err','Please enter a question');return;}
   clearErr('qa-err');showLoad('qa-load',true);
-  try{const res=await fetch('/api/ai/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,question:q})});
+  try{const res=await fetch(API_BASE + '/api/ai/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,question:q})});
     const data=await res.json();if(data.error){showErr('qa-err',data.error);return;}
     qaHistory.push({q:data.question,a:data.answer});
     document.getElementById('qa-convo').innerHTML=qaHistory.map(item=>`<div class="qa-item"><div class="qa-q">Q: ${esc(item.q)}</div><div class="qa-a">${esc(item.a)}</div></div>`).join('');
@@ -516,7 +522,7 @@ async function extractImage(){
   const inp=document.getElementById('img-inp');if(!inp.files[0])return;
   clearErr('img-err');showLoad('img-load',true);showRes('img-result',false);document.getElementById('img-btn').disabled=true;
   const fd=new FormData();fd.append('file',inp.files[0]);fd.append('lang',document.getElementById('ocr-lang').value);
-  try{const res=await fetch('/api/extract/image',{method:'POST',body:fd});const data=await res.json();
+  try{const res=await fetch(API_BASE + '/api/extract/image',{method:'POST',body:fd});const data=await res.json();
     if(data.error){showErr('img-err',data.error);return;}
     const conf=data.confidence||0;
     document.getElementById('img-rsub').textContent=(data.original_filename||'')+' · '+(data.image_size||'');
@@ -531,7 +537,7 @@ async function extractZip(){
   const inp=document.getElementById('zip-inp');if(!inp.files[0])return;
   clearErr('zip-err');showLoad('zip-load',true);showRes('zip-result',false);document.getElementById('zip-btn').disabled=true;document.getElementById('zip-stats-card').style.display='none';
   const fd=new FormData();fd.append('file',inp.files[0]);fd.append('extract_text',document.getElementById('zip-txt').checked?'true':'false');
-  try{const res=await fetch('/api/extract/zip',{method:'POST',body:fd});const data=await res.json();
+  try{const res=await fetch(API_BASE + '/api/extract/zip',{method:'POST',body:fd});const data=await res.json();
     if(!data.success&&data.error){showErr('zip-err',data.error);return;}
     const stats=data.statistics||{};
     document.getElementById('zip-rsub').textContent=(data.original_filename||'')+' · '+(data.file_size||'');
@@ -547,7 +553,7 @@ async function extractZip(){
 async function scrapeUrl(){
   const url=document.getElementById('scrape-url').value.trim();if(!url)return;
   clearErr('web-err');showLoad('web-load',true);showRes('web-result',false);document.getElementById('web-stats-card').style.display='none';
-  try{const res=await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+  try{const res=await fetch(API_BASE + '/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
     const data=await res.json();if(!data.success){showErr('web-err',data.error||'Scrape failed');return;}
     document.getElementById('web-rsub').textContent=(data.title||'No title')+' · '+(data.url||'');
     document.getElementById('web-stats').innerHTML=chip('Words',(data.word_count||0).toLocaleString(),'g')+chip('Links',(data.links?.total)||0,'')+chip('Time',(data.scrape_time_seconds||0)+'s','');
