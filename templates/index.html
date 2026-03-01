@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniExtract AI — Intelligent Document Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c14;--bg2:#0d1220;--bg3:#131929;--bg4:#1a2235;--border:#1c2640;--border2:#253055;--accent:#00e5ff;--accent2:#7c5cbf;--accent3:#ff6b6b;--accent4:#43d4a0;--accent5:#ffb347;--text:#e2e8f0;--text2:#8b9ab5;--text3:#445068;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;--r:12px;--tr:0.2s cubic-bezier(.4,0,.2,1)}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+header{position:sticky;top:0;z-index:100;background:rgba(8,12,20,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem}
+.header-inner{max-width:1400px;margin:0 auto;height:62px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.logo-text{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text)}
+.logo-text span{color:var(--accent)}
+.ai-badge{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--accent4);background:rgba(67,212,160,0.08);border:1px solid rgba(67,212,160,0.25);padding:4px 12px;border-radius:20px}
+.ai-dot{width:6px;height:6px;background:var(--accent4);border-radius:50%;animation:pulse 2s infinite}
+.hero{position:relative;z-index:1;text-align:center;padding:60px 2rem 40px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.18);padding:5px 14px;border-radius:20px;margin-bottom:22px}
+.hero h1{font-family:var(--mono);font-size:clamp(28px,4.5vw,48px);font-weight:700;line-height:1.1;letter-spacing:-2px;margin-bottom:14px}
+.hero h1 .c1{color:var(--accent)}.hero h1 .c2{color:var(--accent2)}
+.hero-sub{font-size:16px;color:var(--text2);max-width:540px;margin:0 auto 16px;font-weight:300}
+.gemini-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent4);background:rgba(67,212,160,0.06);border:1px solid rgba(67,212,160,0.2);padding:4px 12px;border-radius:20px;font-family:var(--mono)}
+.tabs-bar{position:relative;z-index:1;display:flex;justify-content:center;gap:4px;padding:0 1rem;margin-bottom:36px;flex-wrap:wrap}
+.tab-btn{display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all var(--tr)}
+.tab-btn:hover{border-color:var(--border2);color:var(--text)}
+.tab-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,255,0.05)}
+.tab-btn.ai-tab.active{border-color:var(--accent4);color:var(--accent4);background:rgba(67,212,160,0.05)}
+.tab-dot{width:6px;height:6px;background:var(--accent4);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.main-wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 1.5rem 80px}
+.panel{display:none;animation:fadeUp .3s ease forwards}.panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.full{grid-column:1/-1}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;transition:border-color var(--tr)}
+.card:hover{border-color:var(--border2)}
+.card.ai-card{border-color:rgba(67,212,160,0.15)}
+.card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.card-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ci-b{background:rgba(0,229,255,0.1)}.ci-p{background:rgba(124,92,191,0.12)}.ci-g{background:rgba(67,212,160,0.1)}.ci-o{background:rgba(255,179,71,0.1)}
+.card-title{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:.3px}
+.card-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.drop-zone{border:2px dashed var(--border);border-radius:10px;padding:36px 20px;text-align:center;cursor:pointer;transition:all var(--tr);position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:rgba(0,229,255,0.02)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dz-icon{font-size:32px;margin-bottom:10px}.dz-text{font-size:13px;color:var(--text2)}.dz-hint{font-size:11px;color:var(--text3);margin-top:5px}
+.dz-file{margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--accent);background:rgba(0,229,255,0.07);padding:5px 10px;border-radius:5px;word-break:break-all;display:none}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
+.fi{width:100%;padding:10px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;transition:border-color var(--tr);outline:none}
+.fi:focus{border-color:var(--accent)}.fi::placeholder{color:var(--text3)}
+textarea.fi{resize:vertical;min-height:80px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:8px;border:none;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--tr)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#00b8d4);color:#000}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,229,255,.22)}
+.btn-ai{background:linear-gradient(135deg,var(--accent4),#2cb88a);color:#000}
+.btn-ai:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(67,212,160,.22)}
+.btn-sec{background:var(--bg3);border:1px solid var(--border2);color:var(--text)}
+.btn-sec:hover{border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-full{width:100%}.btn-sm{padding:6px 14px;font-size:12px}
+.loading{display:none;flex-direction:column;align-items:center;gap:14px;padding:36px}
+.loading.show{display:flex}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite}
+.spinner.ai-spin{border-top-color:var(--accent4)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-family:var(--mono);font-size:12px;color:var(--text2)}.loading-sub{font-size:11px;color:var(--text3)}
+.result-area{margin-top:20px;display:none}.result-area.show{display:block;animation:fadeUp .3s ease}
+.rtabs{display:flex;gap:3px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:10px;flex-wrap:wrap}
+.rtab{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);transition:all var(--tr);border:1px solid transparent}
+.rtab.active{background:rgba(0,229,255,0.07);border-color:rgba(0,229,255,.25);color:var(--accent)}
+.rtab-content{display:none}.rtab-content.active{display:block;animation:fadeUp .2s ease}
+.tbox{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:380px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.chip{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--text2);font-family:var(--mono)}
+.chip .v{font-weight:700;color:var(--accent)}.chip .v.g{color:var(--accent4)}.chip .v.p{color:var(--accent2)}.chip .v.o{color:var(--accent5)}.chip .v.r{color:var(--accent3)}
+.mtable{width:100%;border-collapse:collapse}.mtable tr{border-bottom:1px solid var(--border)}.mtable tr:last-child{border-bottom:none}
+.mtable td{padding:9px 11px;font-size:12px}.mtable td:first-child{color:var(--text3);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;width:35%}
+.mtable td:last-child{color:var(--text);font-family:var(--mono);font-size:11px;word-break:break-all}
+.ai-section{margin-bottom:20px}
+.ai-section-title{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent4);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.ai-section-title::after{content:'';flex:1;height:1px;background:rgba(67,212,160,.15)}
+.domain-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-family:var(--mono);font-size:14px;font-weight:700;margin-bottom:16px}
+.domain-medical{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);color:var(--accent3)}
+.domain-legal{background:rgba(124,92,191,.1);border:1px solid rgba(124,92,191,.3);color:var(--accent2)}
+.domain-banking{background:rgba(255,179,71,.1);border:1px solid rgba(255,179,71,.3);color:var(--accent5)}
+.domain-general,.domain-academic{background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);color:var(--accent)}
+.kp-list{display:flex;flex-direction:column;gap:7px}
+.kp-item{display:flex;align-items:flex-start;gap:9px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;font-size:13px;color:var(--text)}
+.kp-dot{width:6px;height:6px;background:var(--accent4);border-radius:50%;margin-top:6px;flex-shrink:0}
+.entity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.entity-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px}
+.entity-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:6px}
+.entity-value{font-size:13px;color:var(--text);font-family:var(--mono)}
+.flag-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.2);border-radius:7px;font-size:12px;color:var(--accent3);margin-bottom:6px}
+.qa-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.qa-q{padding:10px 14px;background:rgba(0,229,255,.04);border-bottom:1px solid var(--border);font-size:13px;color:var(--accent);font-family:var(--mono)}
+.qa-a{padding:12px 14px;font-size:13px;color:var(--text);line-height:1.6}
+.links-list{display:flex;flex-direction:column;gap:7px;max-height:300px;overflow-y:auto;scrollbar-width:thin}
+.link-item{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:7px}
+.lbadge{flex-shrink:0;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-top:2px;letter-spacing:.5px}
+.lbadge.ext{background:rgba(255,107,107,.1);color:var(--accent3)}.lbadge.int{background:rgba(67,212,160,.08);color:var(--accent4)}
+.ltext{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lhref{font-size:10px;color:var(--text3);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-list{display:flex;flex-direction:column;gap:5px;max-height:360px;overflow-y:auto;scrollbar-width:thin}
+.file-item{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;padding:9px 13px;background:var(--bg);border:1px solid var(--border);border-radius:7px}
+.fext{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);text-transform:uppercase;white-space:nowrap}
+.fname{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fsize{font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap}
+.copy-btn{padding:4px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;font-size:10px;color:var(--text2);cursor:pointer;transition:all var(--tr);font-family:var(--mono)}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}.copy-btn.copied{border-color:var(--accent4);color:var(--accent4)}
+.err-box{display:none;padding:12px 14px;background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.25);border-radius:7px;color:var(--accent3);font-size:12px;margin-top:14px;font-family:var(--mono)}
+.err-box.show{display:block;animation:fadeUp .3s ease}
+footer{position:relative;z-index:1;text-align:center;padding:28px;border-top:1px solid var(--border);color:var(--text3);font-size:11px;font-family:var(--mono)}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#"><div class="logo-icon">⬡</div><span class="logo-text">Uni<span>Extract</span> AI</span></a>
+    <div class="ai-badge"><span class="ai-dot"></span> Gemini 2.5 Flash · </div>
+  </div>
+</header>
+<section class="hero">
+  <div class="hero-badge"> Data Extraction Hub — AI Powered Upgrade</div>
+  <h1><span class="c1">Intelligent</span> Document<br><span class="c2">Analysis</span> Suite</h1>
+  <p class="hero-sub">Extract, analyze, and understand Medical, Legal and Banking documents using Google Gemini AI</p>
+  <div class="gemini-tag">✦ Powered by Google Gemini 2.5 Flash — Free API</div>
+</section>
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="tab('file')" id="tab-file">📄 File Extractor</button>
+  <button class="tab-btn ai-tab" onclick="tab('ai')" id="tab-ai">🧠 AI Analyzer <span class="tab-dot"></span></button>
+  <button class="tab-btn ai-tab" onclick="tab('qa')" id="tab-qa">💬 Ask Document</button>
+  <button class="tab-btn" onclick="tab('image')" id="tab-image">🖼️ Image OCR</button>
+  <button class="tab-btn" onclick="tab('zip')" id="tab-zip">🗜️ ZIP Analyzer</button>
+  <button class="tab-btn" onclick="tab('web')" id="tab-web">🌐 Web Scraper</button>
+</div>
+<div class="main-wrap">
+
+<!-- FILE -->
+<div class="panel active" id="panel-file">
+  <div class="grid2">
+    <div class="card">
+      <div class="card-hdr"><div class="card-icon ci-b">📄</div><div><div class="card-title">DOCUMENT UPLOAD</div><div class="card-sub">PDF, DOCX, XLSX, PPTX, CSV, HTML, JSON & more</div></div></div>
+      <div class="drop-zone" id="file-dz" ondragover="dg(event,'file-dz')" ondragleave="dl('file-dz')" ondrop="dd(event,'file-inp')">
+        <input type="file" id="file-inp" onchange="fs(this,'file-dz','file-fn')">
+        <div class="dz-icon">📁</div><div class="dz-text">Drop file here or click to browse</div>
+        <div class="dz-hint">PDF, Word, Excel, PowerPoint, CSV, Text, HTML, JSON…</div>
+        <div class="dz-file" id="file-fn"></div>
+      </div>
+      <div style="margin-top:14px"><button class="btn btn-primary btn-full" id="file-btn" onclick="extractFile()" disabled>⚡ Extract Text</button></div>
+      <div class="loading" id="file-load"><div class="spinner"></div><div class="loading-txt">Extracting…</div></div>
+      <div class="err-box" id="file-err"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-icon ci-p">📊</div><div><div class="card-title">SUPPORTED FORMATS</div></div></div>
+      <table class="mtable">
+        <tr><td>Documents</td><td>PDF, DOCX, DOC, RTF</td></tr>
+        <tr><td>Spreadsheets</td><td>XLSX, XLS, CSV</td></tr>
+        <tr><td>Presentations</td><td>PPTX, PPT</td></tr>
+        <tr><td>Web/Markup</td><td>HTML, XML, JSON, YAML</td></tr>
+        <tr><td>Plain Text</td><td>TXT, MD, LOG</td></tr>
+        <tr><td>Source Code</td><td>PY, JS, TS, CSS…</td></tr>
+      </table>
+      <div style="margin-top:16px;padding:12px;background:rgba(67,212,160,0.05);border:1px solid rgba(67,212,160,0.15);border-radius:8px;font-size:12px;color:var(--accent4)">
+        💡 After extracting, click <strong>Analyze with AI</strong> for Gemini-powered insights
+      </div>
+    </div>
+  </div>
+  <div class="result-area" id="file-result">
+    <div class="card full">
+      <div class="card-hdr">
+        <div class="card-icon ci-g">✅</div>
+        <div><div class="card-title">EXTRACTION RESULT</div><div class="card-sub" id="file-rsub"></div></div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="copy-btn" onclick="cp('file-tbox',this)">Copy</button>
+          <button class="btn btn-ai btn-sm" onclick="sendToAI()">🧠 Analyze with AI</button>
+        </div>
+      </div>
+      <div class="stats" id="file-stats"></div>
+      <div class="rtabs"><div class="rtab active" onclick="rt('file','text')">Extracted Text</div><div class="rtab" onclick="rt('file','summary')">Summary</div><div class="rtab" onclick="rt('file','meta')">Metadata</div></div>
+      <div class="rtab-content active" id="file-rt-text"><div class="tbox" id="file-tbox"></div></div>
+      <div class="rtab-content" id="file-rt-summary"><div class="tbox" id="file-sbox"></div></div>
+      <div class="rtab-content" id="file-rt-meta"><table class="mtable" id="file-meta"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- AI ANALYZER -->
+<div class="panel" id="panel-ai">
+  <div class="grid2">
+    <div class="card ai-card">
+      <div class="card-hdr"><div class="card-icon ci-g">🧠</div><div><div class="card-title">AI DOCUMENT ANALYZER</div><div class="card-sub">Powered by Google Gemini 1.5 Flash</div></div></div>
+      <div class="fg">
+        <label class="fl">Paste Document Text</label>
+        <textarea class="fi" id="ai-text" placeholder="Paste your medical report, legal case, banking statement or any document text here…" style="min-height:160px"></textarea>
+      </div>
+      <button class="btn btn-ai btn-full" onclick="runAI()">🧠 Run Full AI Analysis</button>
+      <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn btn-sec" onclick="runDomain()">🔍 Detect Domain</button>
+        <button class="btn btn-sec" onclick="runSummary()">📝 Quick Summary</button>
+      </div>
+      <div class="loading" id="ai-load"><div class="spinner ai-spin"></div><div class="loading-txt">Gemini AI analyzing…</div><div class="loading-sub">Domain detection + entity extraction</div></div>
+      <div class="err-box" id="ai-err"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-icon ci-o">📋</div><div><div class="card-title">WHAT AI DETECTS</div></div></div>
+      <table class="mtable">
+        <tr><td>🏥 Medical</td><td>Patient, diagnosis, medications, lab results, severity</td></tr>
+        <tr><td>⚖️ Legal</td><td>Case no., parties, verdict, charges, cited laws</td></tr>
+        <tr><td>🏦 Banking</td><td>Transactions, balances, amounts, risk flags</td></tr>
+        <tr><td>📚 Academic</td><td>Topic, methodology, findings, conclusions</td></tr>
+        <tr><td>📄 General</td><td>Key points, summary, important findings</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="result-area" id="ai-result">
+    <div class="card full ai-card">
+      <div class="card-hdr">
+        <div class="card-icon ci-g">✨</div>
+        <div><div class="card-title">AI ANALYSIS RESULT</div><div class="card-sub" id="ai-rsub"></div></div>
+        <div style="margin-left:auto"><div class="gemini-tag" style="font-size:10px">✦ Gemini 2.5 Flash</div></div>
+      </div>
+      <div id="ai-domain-badge"></div>
+      <div class="rtabs"><div class="rtab active" onclick="rt('ai','summary')">AI Summary</div><div class="rtab" onclick="rt('ai','entities')">Extracted Entities</div><div class="rtab" onclick="rt('ai','keypoints')">Key Points</div><div class="rtab" onclick="rt('ai','raw')">Raw JSON</div></div>
+      <div class="rtab-content active" id="ai-rt-summary"><div id="ai-summary-out"></div></div>
+      <div class="rtab-content" id="ai-rt-entities"><div id="ai-entities-out"></div></div>
+      <div class="rtab-content" id="ai-rt-keypoints"><div id="ai-kp-out"></div></div>
+      <div class="rtab-content" id="ai-rt-raw"><div class="tbox" id="ai-raw-out"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ASK DOCUMENT -->
+<div class="panel" id="panel-qa">
+  <div class="grid2">
+    <div class="card ai-card">
+      <div class="card-hdr"><div class="card-icon ci-g">💬</div><div><div class="card-title">CHAT WITH DOCUMENT</div><div class="card-sub">Ask anything about your document</div></div></div>
+      <div class="fg"><label class="fl">Document Text</label><textarea class="fi" id="qa-text" placeholder="Paste document text here…" style="min-height:120px"></textarea></div>
+      <div style="display:flex;gap:8px">
+        <input class="fi" type="text" id="qa-q" placeholder="Ask a question…" onkeydown="if(event.key==='Enter')askDoc()" style="flex:1">
+        <button class="btn btn-ai" onclick="askDoc()">Ask →</button>
+      </div>
+      <div class="loading" id="qa-load"><div class="spinner ai-spin"></div><div class="loading-txt">Gemini thinking…</div></div>
+      <div class="err-box" id="qa-err"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-icon ci-p">💡</div><div><div class="card-title">SAMPLE QUESTIONS</div></div></div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div onclick="setQ('What is the main purpose of this document?')" style="padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;color:var(--text2)">📄 What is the main purpose of this document?</div>
+        <div onclick="setQ('Who are the key people mentioned?')" style="padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;color:var(--text2)">👤 Who are the key people mentioned?</div>
+        <div onclick="setQ('What are the important dates?')" style="padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;color:var(--text2)">📅 What are the important dates?</div>
+        <div onclick="setQ('Summarize this in 3 bullet points')" style="padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;color:var(--text2)">📝 Summarize in 3 bullet points</div>
+        <div onclick="setQ('What is the final verdict or conclusion?')" style="padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;color:var(--text2)">⚖️ What is the final verdict or conclusion?</div>
+        <div onclick="setQ('What medications or treatments are mentioned?')" style="padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;font-size:12px;cursor:pointer;color:var(--text2)">🏥 What medications or treatments are mentioned?</div>
+      </div>
+    </div>
+  </div>
+  <div class="result-area" id="qa-result">
+    <div class="card full ai-card">
+      <div class="card-hdr"><div class="card-icon ci-g">💬</div><div><div class="card-title">CONVERSATION</div></div></div>
+      <div id="qa-convo"></div>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE OCR -->
+<div class="panel" id="panel-image">
+  <div class="grid2">
+    <div class="card">
+      <div class="card-hdr"><div class="card-icon ci-b">🖼️</div><div><div class="card-title">IMAGE OCR</div><div class="card-sub">Tesseract — runs entirely on server</div></div></div>
+      <div class="drop-zone" id="img-dz" ondragover="dg(event,'img-dz')" ondragleave="dl('img-dz')" ondrop="dd(event,'img-inp')">
+        <input type="file" id="img-inp" onchange="fs(this,'img-dz','img-fn')" accept=".png,.jpg,.jpeg,.bmp,.tiff,.tif,.webp,.gif">
+        <div class="dz-icon">🔍</div><div class="dz-text">Drop image here</div><div class="dz-hint">PNG, JPG, BMP, TIFF, WEBP, GIF</div>
+        <div class="dz-file" id="img-fn"></div>
+      </div>
+      <div class="fg" style="margin-top:14px"><label class="fl">Language</label>
+        <select class="fi" id="ocr-lang"><option value="eng">English</option><option value="fra">French</option><option value="deu">German</option><option value="spa">Spanish</option><option value="hin">Hindi</option></select>
+      </div>
+      <button class="btn btn-primary btn-full" id="img-btn" onclick="extractImage()" disabled>🔍 Run OCR</button>
+      <div class="loading" id="img-load"><div class="spinner"></div><div class="loading-txt">Running OCR…</div></div>
+      <div class="err-box" id="img-err"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-icon ci-p">🧠</div><div><div class="card-title">OCR PIPELINE</div></div></div>
+      <table class="mtable"><tr><td>Step 1</td><td>Auto-upscale to 1000px</td></tr><tr><td>Step 2</td><td>Grayscale conversion</td></tr><tr><td>Step 3</td><td>Contrast x2</td></tr><tr><td>Step 4</td><td>Sharpen filter</td></tr><tr><td>Step 5</td><td>Tesseract PSM-3</td></tr><tr><td>Step 6</td><td>Best result selection</td></tr></table>
+    </div>
+  </div>
+  <div class="result-area" id="img-result">
+    <div class="card full">
+      <div class="card-hdr">
+        <div class="card-icon ci-g">✅</div>
+        <div><div class="card-title">OCR RESULT</div><div class="card-sub" id="img-rsub"></div></div>
+        <div style="margin-left:auto;display:flex;gap:8px"><button class="copy-btn" onclick="cp('img-tbox',this)">Copy</button><button class="btn btn-ai btn-sm" onclick="sendImgToAI()">🧠 Analyze</button></div>
+      </div>
+      <div class="stats" id="img-stats"></div>
+      <div class="tbox" id="img-tbox"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ZIP -->
+<div class="panel" id="panel-zip">
+  <div class="grid2">
+    <div class="card">
+      <div class="card-hdr"><div class="card-icon ci-b">🗜️</div><div><div class="card-title">ZIP ARCHIVE</div><div class="card-sub">Analyze + extract all contents</div></div></div>
+      <div class="drop-zone" id="zip-dz" ondragover="dg(event,'zip-dz')" ondragleave="dl('zip-dz')" ondrop="dd(event,'zip-inp')">
+        <input type="file" id="zip-inp" onchange="fs(this,'zip-dz','zip-fn')" accept=".zip">
+        <div class="dz-icon">🗜️</div><div class="dz-text">Drop ZIP file here</div>
+        <div class="dz-hint">All files extracted and analyzed</div><div class="dz-file" id="zip-fn"></div>
+      </div>
+      <label style="display:flex;align-items:center;gap:9px;margin-top:14px;cursor:pointer;font-size:13px;color:var(--text2)">
+        <input type="checkbox" id="zip-txt" checked style="width:15px;height:15px;accent-color:var(--accent)"> Extract text from files
+      </label>
+      <button class="btn btn-primary btn-full" id="zip-btn" onclick="extractZip()" disabled style="margin-top:12px">🗜️ Analyze ZIP</button>
+      <div class="loading" id="zip-load"><div class="spinner"></div><div class="loading-txt">Analyzing archive…</div></div>
+      <div class="err-box" id="zip-err"></div>
+    </div>
+    <div class="card" id="zip-stats-card" style="display:none">
+      <div class="card-hdr"><div class="card-icon ci-p">📊</div><div><div class="card-title">ARCHIVE STATS</div></div></div>
+      <div class="stats" id="zip-stats" style="flex-direction:column;gap:7px"></div>
+    </div>
+  </div>
+  <div class="result-area" id="zip-result">
+    <div class="card full">
+      <div class="card-hdr"><div class="card-icon ci-g">✅</div><div><div class="card-title">ZIP RESULT</div><div class="card-sub" id="zip-rsub"></div></div></div>
+      <div class="rtabs"><div class="rtab active" onclick="rt('zip','files')">Files</div><div class="rtab" onclick="rt('zip','summary')">Summary</div><div class="rtab" onclick="rt('zip','text')">Combined Text</div></div>
+      <div class="rtab-content active" id="zip-rt-files"><div class="file-list" id="zip-flist"></div></div>
+      <div class="rtab-content" id="zip-rt-summary"><div class="tbox" id="zip-sbox"></div></div>
+      <div class="rtab-content" id="zip-rt-text"><div class="tbox" id="zip-tbox"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- WEB SCRAPER -->
+<div class="panel" id="panel-web">
+  <div class="grid2">
+    <div class="card">
+      <div class="card-hdr"><div class="card-icon ci-b">🌐</div><div><div class="card-title">WEB SCRAPER</div><div class="card-sub">Extract content from any URL</div></div></div>
+      <div class="fg"><label class="fl">URL</label><input class="fi" type="url" id="scrape-url" placeholder="https://example.com" onkeydown="if(event.key==='Enter')scrapeUrl()"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-full" onclick="scrapeUrl()">🌐 Scrape</button>
+        <button class="btn btn-ai" onclick="scrapeAndAnalyze()" title="Scrape + AI">🧠+</button>
+      </div>
+      <div class="loading" id="web-load"><div class="spinner"></div><div class="loading-txt">Scraping…</div></div>
+      <div class="err-box" id="web-err"></div>
+    </div>
+    <div class="card" id="web-stats-card" style="display:none">
+      <div class="card-hdr"><div class="card-icon ci-g">📊</div><div><div class="card-title">PAGE STATS</div></div></div>
+      <div class="stats" id="web-stats" style="flex-direction:column;gap:7px"></div>
+    </div>
+  </div>
+  <div class="result-area" id="web-result">
+    <div class="card full">
+      <div class="card-hdr">
+        <div class="card-icon ci-g">✅</div>
+        <div><div class="card-title">SCRAPED CONTENT</div><div class="card-sub" id="web-rsub"></div></div>
+        <div style="margin-left:auto"><button class="copy-btn" onclick="cp('web-tbox',this)">Copy</button></div>
+      </div>
+      <div class="rtabs"><div class="rtab active" onclick="rt('web','text')">Full Text</div><div class="rtab" onclick="rt('web','summary')">Summary</div><div class="rtab" onclick="rt('web','links')">Links</div><div class="rtab" onclick="rt('web','meta')">Metadata</div></div>
+      <div class="rtab-content active" id="web-rt-text"><div class="tbox" id="web-tbox"></div></div>
+      <div class="rtab-content" id="web-rt-summary"><div class="tbox" id="web-sbox"></div></div>
+      <div class="rtab-content" id="web-rt-links"><div class="links-list" id="web-links"></div></div>
+      <div class="rtab-content" id="web-rt-meta"><table class="mtable" id="web-meta"></table></div>
+    </div>
+  </div>
+</div>
+
+</div>
+<footer>UniExtract AI · Powered by Google Gemini 2.5 Flash · Privacy-First Local Processing</footer>
+
+<script>
+let lastText='';
+function tab(n){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('panel-'+n).classList.add('active');document.getElementById('tab-'+n).classList.add('active');}
+function rt(panel,name){const p=document.getElementById('panel-'+panel);const tabs=p.querySelectorAll('.rtab');const contents=p.querySelectorAll('.rtab-content');let idx=-1;tabs.forEach((t,i)=>{if(t.textContent.trim().toLowerCase().replace(/\s/g,'').includes(name.toLowerCase()))idx=i;});if(idx>=0){tabs.forEach(t=>t.classList.remove('active'));contents.forEach(c=>c.classList.remove('active'));tabs[idx].classList.add('active');contents[idx].classList.add('active');}}
+function dg(e,id){e.preventDefault();document.getElementById(id).classList.add('drag');}
+function dl(id){document.getElementById(id).classList.remove('drag');}
+function dd(e,iid){e.preventDefault();dl(e.currentTarget.id);const inp=document.getElementById(iid);if(e.dataTransfer.files.length){const dt=new DataTransfer();dt.items.add(e.dataTransfer.files[0]);inp.files=dt.files;inp.dispatchEvent(new Event('change'));}}
+function fs(inp,dzId,fnId){if(inp.files&&inp.files[0]){const el=document.getElementById(fnId);el.textContent='📎 '+inp.files[0].name;el.style.display='block';const prefix=dzId.split('-')[0];const btn=document.getElementById(prefix+'-btn');if(btn)btn.disabled=false;}}
+function showLoad(id,s){document.getElementById(id).classList.toggle('show',s);}
+function showErr(id,msg){const e=document.getElementById(id);e.style.background='rgba(255,107,107,.06)';e.style.borderColor='rgba(255,107,107,.25)';e.style.color='var(--accent3)';e.textContent='⚠ '+msg;e.classList.add('show');}
+function clearErr(id){document.getElementById(id).classList.remove('show');}
+function showRes(id,s){document.getElementById(id).classList.toggle('show',s);}
+function chip(l,v,c){return `<div class="chip">${l}: <span class="v ${c||''}">${v}</span></div>`;}
+function fmtSize(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';return (b/1048576).toFixed(1)+' MB';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function cp(id,btn){try{await navigator.clipboard.writeText(document.getElementById(id).textContent);btn.textContent='✓ Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);}catch(e){btn.textContent='Failed';}}
+
+async function extractFile(){
+  const inp=document.getElementById('file-inp');if(!inp.files[0])return;
+  clearErr('file-err');showLoad('file-load',true);showRes('file-result',false);document.getElementById('file-btn').disabled=true;
+  const fd=new FormData();fd.append('file',inp.files[0]);
+  try{const res=await fetch('/api/extract/file',{method:'POST',body:fd});const data=await res.json();
+    if(data.error){showErr('file-err',data.error);return;}
+    lastText=data.text||'';
+    document.getElementById('file-rsub').textContent=(data.original_filename||'')+' · '+fmtSize(data.file_size||0);
+    document.getElementById('file-stats').innerHTML=chip('Words',(data.word_count||0).toLocaleString(),'g')+chip('Size',fmtSize(data.file_size||0))+chip('Type',data.extension||'?','p')+(data.metadata?.pages?chip('Pages',data.metadata.pages):'');
+    document.getElementById('file-tbox').textContent=data.text||'(No text extracted)';
+    document.getElementById('file-sbox').textContent=data.summary||'(No summary)';
+    let meta=`<tr><td>Filename</td><td>${esc(data.original_filename||'')}</td></tr><tr><td>Extension</td><td>${data.extension||'—'}</td></tr><tr><td>File Size</td><td>${fmtSize(data.file_size||0)}</td></tr><tr><td>Words</td><td>${(data.word_count||0).toLocaleString()}</td></tr>`;
+    for(const[k,v] of Object.entries(data.metadata||{})){if(typeof v!=='object')meta+=`<tr><td>${k}</td><td>${esc(String(v))}</td></tr>`;}
+    document.getElementById('file-meta').innerHTML=meta;
+    showRes('file-result',true);
+  }catch(e){showErr('file-err',e.message);}
+  finally{showLoad('file-load',false);document.getElementById('file-btn').disabled=false;}
+}
+
+function sendToAI(){const text=document.getElementById('file-tbox').textContent;if(!text||text==='(No text extracted)')return;document.getElementById('ai-text').value=text;tab('ai');setTimeout(()=>runAI(),100);}
+
+async function runAI(){
+  const text=document.getElementById('ai-text').value.trim();
+  if(!text){showErr('ai-err','Please paste document text first');return;}
+  clearErr('ai-err');showLoad('ai-load',true);showRes('ai-result',false);
+  try{const res=await fetch('/api/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+    const data=await res.json();if(data.error){showErr('ai-err',data.error);return;}
+    renderAI(data);showRes('ai-result',true);
+  }catch(e){showErr('ai-err',e.message);}
+  finally{showLoad('ai-load',false);}
+}
+
+async function runDomain(){
+  const text=document.getElementById('ai-text').value.trim();if(!text){showErr('ai-err','Please paste text first');return;}
+  clearErr('ai-err');showLoad('ai-load',true);
+  try{const res=await fetch('/api/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+    const data=await res.json();if(data.error){showErr('ai-err',data.error);return;}
+    const d=data.domain||{};const e=document.getElementById('ai-err');
+    e.style.background='rgba(67,212,160,0.06)';e.style.borderColor='rgba(67,212,160,0.25)';e.style.color='var(--accent4)';
+    e.textContent=`✦ Domain: ${d.domain||'General'} · Confidence: ${d.confidence||0}% · ${d.reason||''}`;e.classList.add('show');
+  }catch(e){showErr('ai-err',e.message);}
+  finally{showLoad('ai-load',false);}
+}
+
+async function runSummary(){
+  const text=document.getElementById('ai-text').value.trim();if(!text){showErr('ai-err','Please paste text first');return;}
+  clearErr('ai-err');showLoad('ai-load',true);showRes('ai-result',false);
+  try{const res=await fetch('/api/ai/summarize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+    const data=await res.json();if(data.error){showErr('ai-err',data.error);return;}
+    document.getElementById('ai-rsub').textContent='Quick Summary';
+    document.getElementById('ai-domain-badge').innerHTML='';
+    document.getElementById('ai-summary-out').innerHTML=`<div class="ai-section"><div class="ai-section-title">Executive Summary</div><div style="padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:14px;line-height:1.7;color:var(--text)">${esc(data.executive_summary||'')}</div></div>`;
+    document.getElementById('ai-kp-out').innerHTML=renderKP(data.key_points||[]);
+    document.getElementById('ai-entities-out').innerHTML='<p style="color:var(--text3)">Run Full Analysis for entity extraction</p>';
+    document.getElementById('ai-raw-out').textContent=JSON.stringify(data,null,2);
+    showRes('ai-result',true);
+  }catch(e){showErr('ai-err',e.message);}
+  finally{showLoad('ai-load',false);}
+}
+
+function renderAI(data){
+  const domain=(data.domain||{}).domain||'General';const summary=data.summary||{};const analysis=data.domain_analysis||{};
+  document.getElementById('ai-rsub').textContent=domain+' Document · Gemini AI Analysis';
+  const icons={Medical:'🏥',Legal:'⚖️',Banking:'🏦',Academic:'📚',General:'📄'};
+  document.getElementById('ai-domain-badge').innerHTML=`<div class="domain-badge domain-${domain.toLowerCase()}">${icons[domain]||'📄'} ${domain} Document <span style="font-size:11px;opacity:.7;margin-left:8px">${(data.domain||{}).confidence||0}% confidence</span></div>`;
+  document.getElementById('ai-summary-out').innerHTML=`
+    <div class="ai-section"><div class="ai-section-title">Executive Summary</div><div style="padding:14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:14px;line-height:1.7;color:var(--text)">${esc(summary.executive_summary||'')}</div></div>
+    <div class="ai-section" style="margin-top:16px"><div class="ai-section-title">Important Finding</div><div style="padding:12px;background:rgba(67,212,160,0.05);border:1px solid rgba(67,212,160,0.2);border-radius:8px;font-size:13px;color:var(--accent4)">${esc(summary.important_findings||'—')}</div></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">${chip('Type',summary.document_type||'—','')}${chip('Language',summary.language||'—','')}${chip('Urgency',summary.urgency_level||'—',summary.urgency_level==='High'?'r':summary.urgency_level==='Low'?'g':'')}</div>`;
+  document.getElementById('ai-kp-out').innerHTML=renderKP(summary.key_points||[]);
+  document.getElementById('ai-entities-out').innerHTML=renderEntities(domain,analysis);
+  document.getElementById('ai-raw-out').textContent=JSON.stringify(data,null,2);
+}
+
+function renderKP(kps){if(!kps||!kps.length)return '<p style="color:var(--text3)">No key points extracted</p>';return `<div class="kp-list">${kps.map(k=>`<div class="kp-item"><span class="kp-dot"></span>${esc(k)}</div>`).join('')}</div>`;}
+
+function ecard(l,v){return `<div class="entity-card"><div class="entity-label">${l}</div><div class="entity-value">${esc(v||'Unknown')}</div></div>`;}
+
+function renderEntities(domain,analysis){
+  if(!analysis||Object.keys(analysis).length===0)return '<p style="color:var(--text3)">No domain-specific entities found</p>';
+  if(analysis.error)return `<p style="color:var(--accent3)">${analysis.error}</p>`;
+  let html='';
+  if(domain==='Medical'){
+    const p=analysis.patient||{};
+    html+=`<div class="ai-section"><div class="ai-section-title">Patient Information</div><div class="entity-grid">${ecard('Patient Name',p.name)}${ecard('Age',p.age)}${ecard('Gender',p.gender)}${ecard('Doctor',analysis.doctor)}${ecard('Hospital',analysis.hospital)}${ecard('Date',analysis.date)}</div></div>`;
+    if(analysis.diagnosis?.length)html+=`<div class="ai-section"><div class="ai-section-title">Diagnosis</div><div class="kp-list">${analysis.diagnosis.map(d=>`<div class="kp-item"><span class="kp-dot" style="background:var(--accent3)"></span>${esc(d)}</div>`).join('')}</div></div>`;
+    if(analysis.medications?.length)html+=`<div class="ai-section"><div class="ai-section-title">Medications</div><div class="entity-grid">${analysis.medications.map(m=>`<div class="entity-card"><div class="entity-label">💊 ${esc(m.name||'')}</div><div class="entity-value">${esc(m.dosage||'')} ${esc(m.frequency||'')}</div></div>`).join('')}</div></div>`;
+    if(analysis.severity)html+=`<div style="margin-top:12px">${chip('Severity',analysis.severity,analysis.severity==='Critical'?'r':analysis.severity==='Mild'?'g':'o')}</div>`;
+  }else if(domain==='Legal'){
+    html+=`<div class="ai-section"><div class="ai-section-title">Case Information</div><div class="entity-grid">${ecard('Case Number',analysis.case_number)}${ecard('Case Type',analysis.case_type)}${ecard('Court',analysis.court)}${ecard('Judge',analysis.judge)}${ecard('Verdict',analysis.verdict)}${ecard('Plaintiff',analysis.plaintiff)}${ecard('Defendant',analysis.defendant)}</div></div>`;
+    if(analysis.charges?.length)html+=`<div class="ai-section"><div class="ai-section-title">Charges</div><div class="kp-list">${analysis.charges.map(c=>`<div class="kp-item"><span class="kp-dot" style="background:var(--accent3)"></span>${esc(c)}</div>`).join('')}</div></div>`;
+    if(analysis.outcome)html+=`<div class="ai-section"><div class="ai-section-title">Outcome</div><div style="padding:12px;background:rgba(124,92,191,0.06);border:1px solid rgba(124,92,191,0.2);border-radius:8px;font-size:13px;color:var(--accent2)">${esc(analysis.outcome)}</div></div>`;
+  }else if(domain==='Banking'){
+    html+=`<div class="ai-section"><div class="ai-section-title">Account Information</div><div class="entity-grid">${ecard('Account Holder',analysis.account_holder)}${ecard('Bank',analysis.bank_name)}${ecard('Account Type',analysis.account_type)}${ecard('Opening Balance',analysis.opening_balance)}${ecard('Closing Balance',analysis.closing_balance)}${ecard('Total Credits',analysis.total_credits)}${ecard('Total Debits',analysis.total_debits)}</div></div>`;
+    if(analysis.risk_flags?.length)html+=`<div class="ai-section"><div class="ai-section-title">Risk Flags</div>${analysis.risk_flags.map(f=>`<div class="flag-item">⚠ ${esc(f)}</div>`).join('')}</div>`;
+    if(analysis.transactions?.length){
+      html+=`<div class="ai-section"><div class="ai-section-title">Transactions</div><div style="display:flex;flex-direction:column;gap:5px">`;
+      analysis.transactions.slice(0,8).forEach(t=>{html+=`<div style="display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;font-size:12px;align-items:center"><span style="color:var(--text3);font-family:var(--mono)">${esc(t.date||'')}</span><span>${esc(t.description||'')}</span><span style="color:${t.type==='Credit'?'var(--accent4)':'var(--accent3)'};font-family:var(--mono);font-weight:700">${t.type==='Credit'?'+':'-'}${esc(t.amount||'')}</span></div>`;});
+      html+='</div></div>';
+    }
+  }else{html=`<div class="tbox">${esc(JSON.stringify(analysis,null,2))}</div>`;}
+  return html||'<p style="color:var(--text3)">No entities found</p>';
+}
+
+let qaHistory=[];
+async function askDoc(){
+  const text=document.getElementById('qa-text').value.trim();const q=document.getElementById('qa-q').value.trim();
+  if(!text){showErr('qa-err','Please paste document text first');return;}if(!q){showErr('qa-err','Please enter a question');return;}
+  clearErr('qa-err');showLoad('qa-load',true);
+  try{const res=await fetch('/api/ai/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,question:q})});
+    const data=await res.json();if(data.error){showErr('qa-err',data.error);return;}
+    qaHistory.push({q:data.question,a:data.answer});
+    document.getElementById('qa-convo').innerHTML=qaHistory.map(item=>`<div class="qa-item"><div class="qa-q">Q: ${esc(item.q)}</div><div class="qa-a">${esc(item.a)}</div></div>`).join('');
+    document.getElementById('qa-q').value='';showRes('qa-result',true);
+  }catch(e){showErr('qa-err',e.message);}
+  finally{showLoad('qa-load',false);}
+}
+function setQ(q){document.getElementById('qa-q').value=q;}
+
+async function extractImage(){
+  const inp=document.getElementById('img-inp');if(!inp.files[0])return;
+  clearErr('img-err');showLoad('img-load',true);showRes('img-result',false);document.getElementById('img-btn').disabled=true;
+  const fd=new FormData();fd.append('file',inp.files[0]);fd.append('lang',document.getElementById('ocr-lang').value);
+  try{const res=await fetch('/api/extract/image',{method:'POST',body:fd});const data=await res.json();
+    if(data.error){showErr('img-err',data.error);return;}
+    const conf=data.confidence||0;
+    document.getElementById('img-rsub').textContent=(data.original_filename||'')+' · '+(data.image_size||'');
+    document.getElementById('img-stats').innerHTML=chip('Words',(data.word_count||0).toLocaleString(),'g')+chip('Confidence',conf.toFixed(1)+'%',conf>70?'g':conf>40?'':'r')+chip('Size',data.image_size||'?','p');
+    document.getElementById('img-tbox').textContent=data.text||'(No text found)';showRes('img-result',true);
+  }catch(e){showErr('img-err',e.message);}
+  finally{showLoad('img-load',false);document.getElementById('img-btn').disabled=false;}
+}
+function sendImgToAI(){const text=document.getElementById('img-tbox').textContent;if(!text||text==='(No text found)')return;document.getElementById('ai-text').value=text;tab('ai');setTimeout(()=>runAI(),100);}
+
+async function extractZip(){
+  const inp=document.getElementById('zip-inp');if(!inp.files[0])return;
+  clearErr('zip-err');showLoad('zip-load',true);showRes('zip-result',false);document.getElementById('zip-btn').disabled=true;document.getElementById('zip-stats-card').style.display='none';
+  const fd=new FormData();fd.append('file',inp.files[0]);fd.append('extract_text',document.getElementById('zip-txt').checked?'true':'false');
+  try{const res=await fetch('/api/extract/zip',{method:'POST',body:fd});const data=await res.json();
+    if(!data.success&&data.error){showErr('zip-err',data.error);return;}
+    const stats=data.statistics||{};
+    document.getElementById('zip-rsub').textContent=(data.original_filename||'')+' · '+(data.file_size||'');
+    document.getElementById('zip-stats').innerHTML=chip('Files',data.total_files||0,'g')+chip('Size',stats.total_uncompressed_size||'?','')+chip('With Text',stats.files_with_text||0,'p');
+    document.getElementById('zip-stats-card').style.display='block';
+    document.getElementById('zip-flist').innerHTML=(data.files||[]).map(f=>`<div class="file-item"><span class="fext">${f.extension||'?'}</span><div><div class="fname">${esc(f.name)}</div>${f.text?`<div style="font-size:10px;color:var(--accent4);font-family:var(--mono)">✓ ${f.word_count} words</div>`:''}</div><span class="fsize">${f.uncompressed_size||''}</span></div>`).join('');
+    document.getElementById('zip-sbox').textContent=data.summary||'(No summary)';document.getElementById('zip-tbox').textContent=data.combined_text||'(No text)';
+    showRes('zip-result',true);
+  }catch(e){showErr('zip-err',e.message);}
+  finally{showLoad('zip-load',false);document.getElementById('zip-btn').disabled=false;}
+}
+
+async function scrapeUrl(){
+  const url=document.getElementById('scrape-url').value.trim();if(!url)return;
+  clearErr('web-err');showLoad('web-load',true);showRes('web-result',false);document.getElementById('web-stats-card').style.display='none';
+  try{const res=await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+    const data=await res.json();if(!data.success){showErr('web-err',data.error||'Scrape failed');return;}
+    document.getElementById('web-rsub').textContent=(data.title||'No title')+' · '+(data.url||'');
+    document.getElementById('web-stats').innerHTML=chip('Words',(data.word_count||0).toLocaleString(),'g')+chip('Links',(data.links?.total)||0,'')+chip('Time',(data.scrape_time_seconds||0)+'s','');
+    document.getElementById('web-stats-card').style.display='block';
+    document.getElementById('web-tbox').textContent=data.full_text||'(No text)';document.getElementById('web-sbox').textContent=data.summary||'';
+    const allLinks=[...(data.links?.internal||[]),...(data.links?.external||[])].slice(0,60);
+    document.getElementById('web-links').innerHTML=allLinks.map(l=>`<div class="link-item"><span class="lbadge ${l.external?'ext':'int'}">${l.external?'EXT':'INT'}</span><div style="min-width:0"><div class="ltext">${esc(l.text||l.href)}</div><div class="lhref">${esc(l.href)}</div></div></div>`).join('')||'<p style="color:var(--text3)">No links</p>';
+    document.getElementById('web-meta').innerHTML=`<tr><td>Title</td><td>${esc(data.title||'—')}</td></tr><tr><td>URL</td><td>${esc(data.url||'—')}</td></tr><tr><td>Author</td><td>${esc(data.author||'—')}</td></tr><tr><td>Words</td><td>${(data.word_count||0).toLocaleString()}</td></tr><tr><td>Links</td><td>${data.links?.total||0}</td></tr>`;
+    showRes('web-result',true);
+  }catch(e){showErr('web-err',e.message);}
+  finally{showLoad('web-load',false);}
+}
+async function scrapeAndAnalyze(){await scrapeUrl();const text=document.getElementById('web-tbox').textContent;if(text&&text!=='(No text)'){document.getElementById('ai-text').value=text;tab('ai');setTimeout(()=>runAI(),200);}}
+</script>
+</body>
+</html>
