@@ -1,20 +1,29 @@
 """
 FYP Universal Extractor - Semester 8 Upgrade
-Powered by Google Gemini AI
+Powered by Groq AI (Llama 3.3 70B)
 """
 
 import os, sys, json, uuid
 from pathlib import Path
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 
 sys.path.insert(0, os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'uploads')
-app.config['SECRET_KEY'] = 'fyp-extractor-sem8-gemini'
+app.config['SECRET_KEY'] = 'fyp-extractor-sem8-groq'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# ── CORS: allow your Vercel frontend to call this backend ──────
+CORS(app, resources={r"/api/*": {"origins": [
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+    "https://*.vercel.app",          # all vercel preview URLs
+    "https://fyp-project-ii.vercel.app"  # ← replace with your actual Vercel URL
+]}})
 
 ALLOWED_EXTENSIONS = {
     'pdf','docx','doc','xlsx','xls','pptx','ppt','csv','txt','md',
@@ -141,14 +150,14 @@ def api_ai_summarize():
 
 @app.route('/api/info')
 def api_info():
-    return jsonify({"name":"FYP Universal Extractor Sem8","version":"2.0.0","ai":"Google Gemini 1.5 Flash"})
+    return jsonify({"name":"FYP Universal Extractor Sem8","version":"2.0.0","ai":"Groq Llama 3.3 70B"})
 
 @app.errorhandler(413)
 def too_large(e): return jsonify({"error":"File too large"}),413
 
 if __name__ == '__main__':
     print("="*60)
-    print("  FYP Extractor Sem8 — Gemini AI Powered")
+    print("  FYP Extractor Sem8 — Groq AI Powered")
     print("  URL: http://localhost:5000")
     print("="*60)
     app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)
