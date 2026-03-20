@@ -1,0 +1,13 @@
+flask
+pdfplumber
+python-docx
+openpyxl
+python-pptx
+Pillow
+beautifulsoup4
+lxml
+chardet
+requests
+groq
+reportlab
+gunicorn
