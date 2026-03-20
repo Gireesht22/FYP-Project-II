@@ -8,7 +8,7 @@ from groq import Groq
 import json
 import re
 # ── CONFIGURE ────────────────────────────────────────────────────────────────
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 client = Groq(api_key=GROQ_API_KEY)
 MODEL = "llama-3.3-70b-versatile"
 
